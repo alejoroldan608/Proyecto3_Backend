@@ -13,6 +13,5 @@ sequelize.authenticate().then(() => {
 });
 
 bdatos.sequelize = sequelize;
-//database.Sequelize = Sequelize;
 
 module.exports = bdatos;

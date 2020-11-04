@@ -23,7 +23,8 @@ router.post("/login", validarlogin, async (req, res) => {
       if (usuario[0].password == contrasena) {
         const payload = {
           id: usuario[0].id,
-          nombre: usuario[0].nombre
+          nombre: usuario[0].nombre,
+          roleId: usuario[0].roleId
         }
 
         const token = jwt.sign(payload, SECRET);
