@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 INSERT INTO usuarios
 (usuario, nombre_apellido, email, telefono, direccion, password, roleId) 
-VALUES ("Useradmin","Alejandro Roldan","alejoroldan@admin.com","3002949541","Calle siempre viva","Aleadmin", 2);
+VALUES ("Useradmin","Alejandro Roldan","alejoroldan@admin.com","3002949541","Calle siempre viva","Aleadmin", 2),
+    ("user2","Camilo Serna","Camiloserna@qmail.com","3002009921","carrera alegre","camiloserna", 1);
 
 CREATE TABLE IF NOT EXISTS productos (
     id int NOT NULL AUTO_INCREMENT,
@@ -56,7 +57,6 @@ INSERT INTO metodos_pago (descripcion) VALUES ('Efectivo'), ('Tarjeta de Credito
 
 CREATE TABLE IF NOT EXISTS pedidos (
   id int NOT NULL AUTO_INCREMENT,
-  /* fecha TIMESTAMP NOT NULL, */
   id_usuario int DEFAULT NULL,
   id_estado int DEFAULT NULL,
   id_met_pago int DEFAULT NULL,

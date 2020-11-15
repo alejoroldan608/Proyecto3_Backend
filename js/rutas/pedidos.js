@@ -7,7 +7,6 @@ const { validarpedido } = require("../validaciones/validarpedido");
 const conexionPedidos = require("../basesdatos/conexion/pedidos");
 const conexionProductos = require("../basesdatos/conexion/productos");
 const conexionDescPedido = require("../basesdatos/conexion/desc_pedidos");
-const { crear } = require("../basesdatos/conexion/desc_pedidos");
 
 const ADMIN_IDROLE = 2;
 
@@ -15,33 +14,30 @@ router.post("/crear", validateToken, validarpedido, async (req, res) => {
     try {
         const validarProductos = await detallesPedidosProductos(req.body.productos);
   
-      if (validarProductos && validarProductos.error)
-        return res.status(400).json({ error: 400, detailError: validarProductos.error });
+        if (validarProductos && validarProductos.error)
+            return res.status(400).json({ error: 400, detailError: validarProductos.error });
+          
+            console.log(req.body);
   
-      let guardarPedido = await conexionPedidos.crear(req.body);
-      for (let i=0; i<req.body.productos.length; i++){
-        await crear(guardarPedido[0], req.body.productos[i].id_producto, req.body.productos[i].cantidad);
-      }
-
+        let guardarPedido = await conexionPedidos.crear(req.body);
+        
   
-      res.json(req.body);
+        await DescPedido(guardarPedido[0], req.body.productos);
+  
+        res.json(req.body);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
-  });
+});
 
 const detallesPedidosProductos = async (productos) => {
 
-    console.log(productos);
-
     const idsProductosPedido = productos.map((item) => item.id_producto);
   
-    const idsProductosBdatos = (await conexionProductos.BuscarUnid(idsProductosPedido)).map((item) => item.id);
-  
-    console.log(idsProductosBdatos);
+    const idsProductosbdatos = (await conexionProductos.BuscarPorIds(idsProductosPedido)).map((item) => item.id);
 
-    if (idsProductosPedido.length != idsProductosBdatos.length) {
-        let detallesError = idsProductosPedido.filter((item) => !idsProductosBdatos.includes(item)).map((item) => {
+    if (idsProductosPedido.length != idsProductosbdatos.length) {
+        let detallesError = idsProductosPedido.filter((item) => !idsProductosbdatos.includes(item)).map((item) => {
             return {
                 id: item,
                 message: "El Producto no existe"
@@ -50,16 +46,16 @@ const detallesPedidosProductos = async (productos) => {
         return { error: detallesError };
     }
 };
-/*
-const crearDescPedido = async (id_pedido, productos) => {
+
+const DescPedido = async (id_pedido, productos) => {
     for (const item of productos) {
-      const descPedido = {
+      let descPedido = {
         id_pedido,
-        id_producto: item.id,
-        cantidad: item.cantidad,
+        id_producto: item.id_producto,
+        cantidad: item.cantidad
       };
-  
-      await accesoDescPedido.crear(descPedido);
+      console.log(descPedido);
+      await conexionDescPedido.crear(descPedido);
     }
 };
 
@@ -69,9 +65,9 @@ router.get("/", validateToken, async (req, res) => {
       let pedidos = null;
   
       if (roleId === ADMIN_IDROLE) {
-        pedidos = await accesoPedidos.encontrarTodos();
+        pedidos = await conexionPedidos.BuscarTodos();
       } else {
-        pedidos = await accesoPedidos.encontrarTodosPorId(id_usuario);
+        pedidos = await conexionPedidos.BuscarTodosPoridusuario(id_usuario);
       }
   
       return res.json(pedidos);
@@ -88,9 +84,9 @@ router.get("/:id", validateToken, async (req, res) => {
       let pedido = null;
   
       if (roleId === ADMIN_IDROLE) {
-        pedido = await accesoPedidos.encontrarPorId(id);
+        pedido = await conexionPedidos.BuscarPorId(id);
       } else {
-        pedido = await accesoPedidos.encontrarPorIdYidUsuario(id, id_usuario);
+        pedido = await conexionPedidos.BuscarPorIdYidusuario(id, id_usuario);
       }
   
       return res.json(pedido);
@@ -99,22 +95,22 @@ router.get("/:id", validateToken, async (req, res) => {
     }
 });
 
-router.put("/:id", validateToken, validarPermisos, async (req, res) => {
+router.put("/:id", validateToken, validatePermissions, async (req, res) => {
     try {
       const { id } = req.params;
       const { id_estado } = req.body;
   
       if (!id_estado) {
-          return res.status(400).json({ error: "The resource status id is required." });
+          return res.status(400).json({ error: "id del estado es requerido" });
       }
         
-      let pedido = await accesoPedidos.encontrarPorId(id);
+      let pedido = await conexionPedidos.BuscarPorId(id);
 
       if (!pedido.length) {
-          return res.status(404).json({ error: "Resource does not exist." });
+          return res.status(404).json({ error: "Recurso no existe" });
       }
         
-      await accesoPedidos.actualizarEstado(id, id_estado);
+      await conexionPedidos.ActualizarEstado(id, id_estado);
   
       res.json(req.body);
     } catch (error) {
@@ -126,19 +122,18 @@ router.delete("/:id", validateToken, validatePermissions, async (req, res) => {
     try {
       const { id } = req.params;
   
-      let pedido = await accesoPedidos.encontrarPorId(id);
+      let pedido = await accesoPedidos.BuscarPorId(id);
       if (!pedido.length)
-        return res.status(404).json({ error: "Resource does not exist." });
+        return res.status(404).json({ error: "Recurso no existe" });
   
-      await accesoDescPedido.eliminar(id);
+      await conexionDescPedido.Remover(id);
   
-      await accesoPedidos.eliminar(id);
+      await conexionPedidos.Remover(id);
   
-      res.json({ message: "Resource removed successfully." });
+      res.json({ message: "Recurso eliminado correctamente" });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   });
 
-  */
 module.exports = router;

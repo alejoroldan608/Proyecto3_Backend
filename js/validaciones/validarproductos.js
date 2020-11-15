@@ -1,5 +1,4 @@
 const validarProducto = (req, res, next) => {
-    console.log('validar peticion');
     const { description, precio } = req.body;
     if(description && precio){
         if (typeof(description) === "string" && typeof(precio) === "number"){

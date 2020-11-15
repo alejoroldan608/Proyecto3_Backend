@@ -1,5 +1,7 @@
 const bdatos = require("../conexion");
 
+
+
 const crearProducto = async (body) => {
   return await bdatos.sequelize.query(
     `INSERT INTO PRODUCTOS (description, precio) VALUES ("${body.description}", ${body.precio});`,
@@ -23,7 +25,6 @@ const BuscarProducto = async () => {
   };
   
   const BuscarUnid = async (id) => {
-      console.log(id);
     return await bdatos.sequelize.query(
       `SELECT * FROM PRODUCTOS WHERE ID IN (${id});`,
       {

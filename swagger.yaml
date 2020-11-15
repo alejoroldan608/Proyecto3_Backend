@@ -1,0 +1,477 @@
+swagger: "2.0"
+info:
+  description: "API para realizar pedidos de comida italiana. Los clientes pueden registrarse, ver la lista de productos y ordenar. Los administradores pueden recibir pedidos y actualizarlos."
+  version: "1.0.0"
+  title: "Delilah Resto Italy"
+host: "localhost:3000"
+basePath: "/api"
+tags:
+- name: "Usuarios"
+  description: "Endpoints para login y creacion de los usuarios"
+- name: "Productos"
+  description: "Endpoints para la creacion, consulta, actualizacion y eliminación de los productos"
+- name: "Pedidos"
+  description: "Endpoints para la creacion, consulta, actualización y la eliminación de los pedidos" 
+schemes:
+- "http"
+paths:
+  /crearProducto:
+    post:
+      tags:
+      - "Productos"
+      summary: "Crear nuevos productos"
+      description: "Se requiere enviar en el header de la petición el Token de autorización"
+      operationId: "crearProducto"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token Bearer"
+        in: "header"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Request con el cual se creara el nuevo producto"
+        required: true
+        schema:
+          $ref: "#/definitions/Producto"
+      responses:
+        "200":
+          description: "Nuevo producto creado"
+        "400":
+          description: "Datos inválidos o incompletos"
+        "401":
+          description: "Acceso no autorizado"
+        "403":
+          description: "No tiene permisos para realizar esta acción"
+        "500":
+          description: "Error interno del servidor"
+  /consultarProductos:
+    get:
+      tags:
+      - "Productos"
+      summary: "Consultar productos"
+      description: "Se requiere enviar en el header de la petición el Token de autorización"
+      operationId: "consultarProductos"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "token Bearer"
+          in: "header"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Consulta realizada"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Producto"
+        "400":
+          description: "Datos inválidos o incompletos"
+        "401":
+          description: "Acceso no autorizado"
+        "500":
+          description: "Error interno del servidor"      
+  /actualizarProducto:
+    put:
+      tags:
+      - "Productos"
+      summary: "Actualizar un producto"
+      description: "Se requiere enviar en el header de la petición el Token de autorización, además, se debe enviar el id del producto que se desea actualizar"
+      operationId: "actualizarProducto"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token Bearer"
+        in: "header"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "id"
+        required: true
+        type: "integer"
+        description: "Id del producto que se desea actualizar"
+      - in: "body"
+        name: "body"
+        description: "Requerimiento con los datos a actualizar"
+        required: true
+        schema:
+          $ref: "#/definitions/Producto"
+      responses:
+        "200":
+          description: "Producto Actualizado"
+        "400":
+          description: "Datos inválidos o incompletos"
+        "401":
+          description: "Acceso no autorizado"
+        "403":
+          description: "No tiene permisos para realizar esta acción"
+        "500":
+          description: "Error interno del servidor"
+  /eliminarProducto:
+    delete:
+      tags:
+      - "Productos"
+      summary: "Eliminar un producto"
+      description: "Se requiere enviar en el header de la petición el Token de autorización, además, se debe enviar el id del producto que se desea eliminar"
+      operationId: "eliminarProducto"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "token Bearer"
+          in: "header"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "id"
+          required: true
+          type: "integer"
+          description: "Id del producto que se desea eliminar"
+      responses:
+        "200":
+          description: "Producto eliminado"
+        "400":
+          description: "Datos inválidos o incompletos"
+        "401":
+          description: "Acceso no autorizado"
+        "403":
+          description: "No tiene permisos para realizar esta acción"
+        "500":
+          description: "Error interno del servidor"
+  /crearPedido:
+    post:
+      tags:
+      - "Pedidos"
+      summary: "Crear un nuevo pedido"
+      description: "Se requiere enviar en el header de la petición el Token de autorización"
+      operationId: "crearPedido"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token Bearer"
+        in: "header"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Requerimiento para crear un nuevo pedido"
+        required: true
+        schema:
+          $ref: "#/definitions/crearPedido"
+      responses:
+        "200":
+          description: "Pedido nuevo creado"
+        "400":
+          description: "Datos inválidos o incompletos"
+        "401":
+          description: "Acceso no autorizado"
+        "500":
+          description: "Error interno del servidor"
+  /consultarPedidos:
+    get:
+      tags:
+      - "Pedidos"
+      summary: "Consulta de pedidos"
+      description: "Se requiere enviar en el header de la petición el Token de autorización"
+      operationId: "consultarPedidos"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token Bearer"
+        in: "header"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Consulta realizada"
+          schema:
+            type: "array"
+            items:
+             $ref: "#/definitions/Pedido"
+        "400":
+          description: "Datos inválidos o incompletos"
+        "401":
+          description: "Acceso no autorizado"
+        "500":
+          description: "Error interno del servidor"
+  /actualizarPedido:
+    put:
+      tags:
+      - "Pedidos"
+      summary: "Modificar un pedido"
+      description: "Se requiere enviar en el header de la petición el Token de autorización, además, se debe enviar el id del pedido que se desea actualizar"
+      operationId: "actualizarPedido"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token Bearer"
+        in: "header"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "id"
+        required: true
+        type: "integer"
+        description: "Id del pedido que se desea actualizar"
+      - in: "body"
+        name: "body"
+        description: "Requerimiento con los datos del pedido a actualizar"
+        required: true
+        schema:
+          $ref: "#/definitions/actualizarPedido"
+      responses:
+        "200":
+          description: "Pedido actualizado correctamente"
+          schema:
+           $ref: '#/definitions/Pedido'
+        "404":
+          description: "El pedido no existe"
+        "401":
+          description: "Acceso no autorizado"
+        "403":
+          description: "No tiene permisos para realizar esta acción"
+        "500":
+          description: "Error interno del servidor"
+  /eliminarPedido:
+    delete:
+      tags:
+      - "Pedidos"
+      summary: "Eliminar un pedido"
+      description: "Se requiere enviar en el header de la petición el Token de autorización, además, se debe enviar el id del pedido que se desea eliminar"
+      operationId: "eliminarPedido"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "token Bearer"
+        in: "header"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "id"
+        required: true
+        type: "integer"
+        description: "Id del producto que se desea eliminar"
+      responses:
+        "200":
+          description: "Pedido eliminado"
+        "404":
+          description: "El pedido no existe"
+        "401":
+          description: "Acceso no autorizado"
+        "403":
+          description: "No tiene permisos para realizar esta acción"
+        "500":
+          description: "Error interno del servidor"
+  /login:
+    post:
+      tags:
+      - "Usuarios"
+      summary: "Login de usuario"
+      description: ""
+      operationId: "loginUsuario"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Requerimiento para ingresar"
+        required: true
+        schema:
+          $ref: "#/definitions/Login"
+      responses:
+        "401":
+          description: "Usuario no registrado"
+        "400":
+          description: "Datos de acceso inválidos"
+        "200":
+          description: "Acceso correcto"
+        "500":
+          description: "Error interno del servidor"
+  /crear:
+    post:
+      tags:
+      - "Usuarios"
+      summary: "Crear un nuevo usuario"
+      description: ""
+      operationId: "crearUsuario"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Requerimiento para crear un nuevo usuario"
+        required: true
+        schema:
+          $ref: "#/definitions/Usuario"
+      responses:
+        "200":
+          description: "Nuevo usuario creado"
+        "400":
+          description: "Datos de acceso inválidos"
+        "409":
+          description: "El usuario ya existe"
+        "500":
+          description: "Error interno del servidor"
+definitions:
+  Producto:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 1
+      descripcion:
+        type: "string"
+        example: "Hamburguesa"
+      precio:
+        type: "integer"
+        format: "int64"
+        example: 500
+  Pedido:
+    type: "object"
+    properties:
+      id_pedidos:
+        type: "integer"
+        format: "int64"
+        example: 7
+      id_estado:
+        type: "integer"
+        format: "int64"
+        example: 1
+      estado:
+        type: "string"
+        example: "Nuevo"
+      id_met_pago:
+        type: "integer" 
+        format: "int64"
+        example: 1
+      metodo_de_pago:
+        type: "string"
+        example: "Efectivo"
+      cantidad:
+        type: "integer" 
+        format: "int64"
+        example: 2
+      id_producto:
+        type: "integer" 
+        format: "int64"
+        example: 1
+      producto:
+        type: "string"
+        example: "Hamburguesa"
+      precio:
+        type: "integer" 
+        format: "int64"
+        example: 500
+      id_usuario:
+        type: "integer" 
+        format: "int64"
+        example: 1
+      nombre_completo:
+        type: "string"
+        example: "Carlos Perez"
+      email:
+        type: "string"
+        example: "caperez@gmail.com"
+      telefono:
+        type: "string"
+        example: "4567894521"
+      direccion:
+        type: "string"
+        example: "abc123"
+      roleId:
+        type: "integer" 
+        format: "int64"
+        example: 1
+      rol:
+        type: "string"
+        example: "cliente"
+  descProductos:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          example: 1
+        cantidad:
+          type: "integer"
+          format: "int64"
+          example: 3
+  crearPedido:
+    type: "object"
+    properties:
+      id_usuario:
+        type: "integer"
+        format: "int64"
+        example: 1
+      id_met_pago:
+        type: "integer"
+        format: "int64"
+        example: 2
+      productos:
+        type: "array"
+        xml:
+          name: "productos"
+          wrapped: true
+        items:
+          $ref: '#/definitions/descProductos'
+  actualizarPedido:
+    type: "object"
+    properties:
+      id_estado:
+        type: "integer"
+        format: "int64"
+        example: 5
+  Usuario:
+    type: "object"
+    properties:
+      usuario:
+        type: "string"  
+      nombre_apellido:
+        type: "string" 
+      email:
+        type: "string"
+        format: "email"
+      telefono:
+        type: "string"        
+      Direccion:
+        type: "string"
+      password:
+        type: "string"
+        format: "password"
+      roleId:
+        type: "integer"
+        format: "int64"
+        example: 1
+  Login:
+    type: "object"
+    properties:
+      usuario:
+        type: "string"
+      contrasena:
+        type: "string"
+        format: "password"
+externalDocs:
+  description: "Find out more DelilahResto"
+  url: "http://localhost:8000/" 
